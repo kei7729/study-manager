@@ -1,0 +1,1212 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2026年7月・8月 勉強管理カレンダー</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --panel: #ffffff;
+      --ink: #1f2933;
+      --muted: #697586;
+      --line: #d9dee7;
+      --accent: #2563eb;
+      --accent-weak: #e8f0ff;
+      --danger: #c2410c;
+      --shadow: 0 10px 26px rgba(31, 41, 55, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", Meiryo, system-ui, sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover { border-color: #9aa7b8; }
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 22px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 9px 14px;
+      min-width: 104px;
+      font-weight: 700;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(240px, 25%) 1fr;
+      min-height: 0;
+      align-items: start;
+    }
+
+    aside {
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+      padding: 18px;
+      overflow: auto;
+      position: sticky;
+      top: 70px;
+      max-height: calc(100vh - 70px);
+      z-index: 10;
+    }
+
+    main {
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .side-title {
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+
+    .subject-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .text-input,
+    .day-input,
+    textarea {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px 10px;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .add-btn {
+      padding: 8px 12px;
+      background: #111827;
+      color: #fff;
+      border-color: #111827;
+      font-weight: 700;
+    }
+
+    .subject-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .subject-row {
+      display: grid;
+      grid-template-columns: auto 1fr 82px auto;
+      gap: 8px;
+      align-items: center;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fbfcfe;
+    }
+
+    .subject-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      font-weight: 800;
+      color: #fff;
+      border-radius: 50%;
+    }
+
+    .subject-name {
+      border: 0;
+      background: transparent;
+      width: 100%;
+      min-width: 0;
+      padding: 5px 0;
+      color: var(--ink);
+    }
+
+    .goal-input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 7px;
+      font-size: 12px;
+    }
+
+    .icon-btn {
+      min-width: 44px;
+      height: 32px;
+      padding: 0 8px;
+      line-height: 1;
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .hint {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .toolbar h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .small-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .small-actions button {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(980px, 1fr));
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .month {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      min-width: 980px;
+    }
+
+    .month-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      background: #eef2f7;
+      border-bottom: 1px solid var(--line);
+      font-weight: 800;
+    }
+
+    .weekday,
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+
+    .weekday span {
+      padding: 8px 2px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      background: #fafbfc;
+      font-weight: 700;
+    }
+
+    .day {
+      min-height: 178px;
+      padding: 9px;
+      min-width: 140px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .day:nth-child(7n) { border-right: 0; }
+
+    .day.blank {
+      background: #f1f4f8;
+    }
+
+    .date-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 18px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .day-input {
+      padding: 6px 7px;
+      font-size: 12px;
+      height: 32px;
+    }
+
+    .chips {
+      display: grid;
+      gap: 5px;
+      align-content: flex-start;
+    }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      max-width: 100%;
+      min-height: 34px;
+      padding: 6px 8px;
+      border: 0;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+      overflow: hidden;
+      text-align: left;
+      white-space: normal;
+    }
+
+    .chip.empty {
+      color: #263445;
+      background: var(--accent-weak);
+      border: 1px solid #bcd0ff;
+    }
+
+    .progress-page {
+      display: none;
+    }
+
+    .progress-page.active,
+    .calendar-page.active {
+      display: block;
+    }
+
+    .calendar-page {
+      display: none;
+    }
+
+    .progress-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .metric-value {
+      margin-top: 4px;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .gantt {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: auto;
+      box-shadow: var(--shadow);
+    }
+
+    .gantt-inner {
+      min-width: 980px;
+    }
+
+    .gantt-header,
+    .gantt-row {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .gantt-header {
+      position: sticky;
+      top: 0;
+      background: #eef2f7;
+      z-index: 5;
+      font-weight: 800;
+    }
+
+    .gantt-label,
+    .gantt-months {
+      padding: 10px;
+    }
+
+    .gantt-label {
+      border-right: 1px solid var(--line);
+      min-width: 0;
+    }
+
+    .gantt-months {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+      padding: 0;
+    }
+
+    .gantt-months span {
+      min-height: 39px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .gantt-months span:last-child { border-right: 0; }
+
+    .track {
+      position: relative;
+      min-height: 58px;
+      background:
+        repeating-linear-gradient(to right, transparent 0, transparent calc(100% / 2 - 1px), #edf0f5 calc(100% / 2 - 1px), #edf0f5 calc(100% / 2));
+    }
+
+    .bar {
+      position: absolute;
+      top: 12px;
+      height: 34px;
+      border-radius: 6px;
+      color: #fff;
+      padding: 8px 9px;
+      font-size: 12px;
+      font-weight: 800;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      min-width: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    .subject-progress {
+      margin-top: 7px;
+      height: 8px;
+      border-radius: 999px;
+      background: #e5eaf2;
+      overflow: hidden;
+    }
+
+    .subject-progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .empty-state {
+      padding: 28px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    dialog {
+      width: min(560px, calc(100vw - 28px));
+      border: 0;
+      border-radius: 8px;
+      padding: 0;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
+    }
+
+    dialog::backdrop {
+      background: rgba(15, 23, 42, 0.35);
+    }
+
+    .modal-head,
+    .modal-body,
+    .modal-foot {
+      padding: 16px;
+    }
+
+    .modal-head {
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .record-section {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .record-section + .record-section {
+      margin-top: 12px;
+    }
+
+    .record-section h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .modal-foot {
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      padding: 9px 14px;
+      font-weight: 800;
+    }
+
+    .delete-entry {
+      color: var(--danger);
+      padding: 9px 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .calendar-grid { grid-template-columns: repeat(2, minmax(900px, 1fr)); }
+      .month { min-width: 900px; }
+      .day { min-width: 128px; }
+      .progress-summary { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      header {
+        position: static;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        position: static;
+        max-height: none;
+      }
+
+      .calendar-grid,
+      .progress-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .calendar-grid {
+        overflow-x: auto;
+      }
+
+      .month {
+        min-width: 860px;
+      }
+
+      .day {
+        min-width: 122px;
+      }
+
+      .day { min-height: 160px; }
+      .field-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>2026年7月・8月 勉強管理カレンダー</h1>
+      <nav class="tabs" aria-label="ページ切り替え">
+        <button class="tab active" type="button" data-page="calendar">カレンダー</button>
+        <button class="tab" type="button" data-page="progress">進捗</button>
+      </nav>
+    </header>
+
+    <div class="layout">
+      <aside>
+        <h2 class="side-title">科目</h2>
+        <form class="subject-form" id="subjectForm">
+          <input class="text-input" id="subjectInput" type="text" placeholder="例：ターゲット" autocomplete="off">
+          <button class="add-btn" type="submit">追加</button>
+        </form>
+        <div class="subject-list" id="subjectList"></div>
+        <p class="hint">日付の入力欄には科目番号を入れます。最大9科目まで「1,2,3」のように入力できます。科目ごとのゴールには、ページ数や問題番号などの最終数値を入れてください。</p>
+      </aside>
+
+      <main>
+        <section class="calendar-page active" id="calendarPage">
+          <div class="toolbar">
+            <h2>2026年 7月-8月</h2>
+            <div class="small-actions">
+              <button type="button" id="exportBtn">保存データを書き出し</button>
+              <button type="button" id="clearBtn">全データ削除</button>
+            </div>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </section>
+
+        <section class="progress-page" id="progressPage">
+          <div class="toolbar">
+            <h2>科目別進捗</h2>
+          </div>
+          <div class="progress-summary" id="progressSummary"></div>
+          <div class="gantt" id="gantt"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="entryDialog">
+    <form method="dialog" id="entryForm">
+      <div class="modal-head">
+        <div>
+          <h2 class="modal-title" id="modalTitle">学習記録</h2>
+          <div class="hint" id="modalSub"></div>
+        </div>
+        <button class="close-btn" type="button" id="closeDialog" aria-label="閉じる">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="record-section">
+          <h3>予定</h3>
+          <div class="field-grid">
+            <label>
+              開始
+              <input class="text-input" id="planStart" type="text" placeholder="例：1">
+            </label>
+            <label>
+              終了
+              <input class="text-input" id="planEnd" type="text" placeholder="例：300">
+            </label>
+          </div>
+        </div>
+        <div class="record-section">
+          <h3>実行</h3>
+          <div class="field-grid">
+            <label>
+              開始
+              <input class="text-input" id="actualStart" type="text" placeholder="例：1">
+            </label>
+            <label>
+              終了
+              <input class="text-input" id="actualEnd" type="text" placeholder="例：200">
+            </label>
+          </div>
+        </div>
+        <label style="margin-top: 12px;">
+          メモ
+          <textarea id="entryMemo" placeholder="理解度、復習したい点、宿題など"></textarea>
+        </label>
+      </div>
+      <div class="modal-foot">
+        <button class="delete-entry" type="button" id="deleteEntry">この日の科目を削除</button>
+        <button class="primary" type="submit">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    const STORAGE_KEY = "study-manager-2026-v2-jul-aug";
+    const LEGACY_STORAGE_KEY = "study-manager-2026-v1";
+    const YEAR = 2026;
+    const VIEW_MONTHS = [6, 7];
+    const MAX_SUBJECTS_PER_DAY = 9;
+    const circled = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩","⑪","⑫","⑬","⑭","⑮","⑯","⑰","⑱","⑲","⑳"];
+    const colors = ["#2563eb", "#059669", "#dc2626", "#7c3aed", "#d97706", "#0891b2", "#be123c", "#4f46e5", "#15803d"];
+    const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+    const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+    const chartStart = new Date(YEAR, 6, 1);
+    const chartEnd = new Date(YEAR, 7, 31);
+    const totalDays = daysBetween(chartStart, chartEnd) + 1;
+
+    let state = loadState();
+    let editing = null;
+
+    const subjectForm = document.getElementById("subjectForm");
+    const subjectInput = document.getElementById("subjectInput");
+    const subjectList = document.getElementById("subjectList");
+    const calendarGrid = document.getElementById("calendarGrid");
+    const progressSummary = document.getElementById("progressSummary");
+    const gantt = document.getElementById("gantt");
+    const entryDialog = document.getElementById("entryDialog");
+    const entryForm = document.getElementById("entryForm");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalSub = document.getElementById("modalSub");
+    const planStart = document.getElementById("planStart");
+    const planEnd = document.getElementById("planEnd");
+    const actualStart = document.getElementById("actualStart");
+    const actualEnd = document.getElementById("actualEnd");
+    const entryMemo = document.getElementById("entryMemo");
+
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById("calendarPage").classList.toggle("active", tab.dataset.page === "calendar");
+        document.getElementById("progressPage").classList.toggle("active", tab.dataset.page === "progress");
+        renderProgress();
+      });
+    });
+
+    subjectForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = subjectInput.value.trim();
+      if (!name) return;
+      const id = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
+      const number = nextSubjectNumber();
+      state.subjects.push({
+        id,
+        number,
+        name,
+        goal: 0,
+        color: colors[(number - 1) % colors.length]
+      });
+      subjectInput.value = "";
+      persistAndRender();
+    });
+
+    document.getElementById("closeDialog").addEventListener("click", () => entryDialog.close());
+
+    entryForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!editing) return;
+      const entry = findEntry(editing.date, editing.subjectId);
+      if (entry) {
+        entry.planStart = planStart.value.trim();
+        entry.planEnd = planEnd.value.trim();
+        entry.actualStart = actualStart.value.trim();
+        entry.actualEnd = actualEnd.value.trim();
+        entry.memo = entryMemo.value.trim();
+        delete entry.start;
+        delete entry.end;
+      }
+      persistAndRender();
+      entryDialog.close();
+    });
+
+    document.getElementById("deleteEntry").addEventListener("click", () => {
+      if (!editing) return;
+      const subject = subjectById(editing.subjectId);
+      const subjectName = subject ? `${labelNumber(subject.number)} ${subject.name}` : "この科目";
+      if (!confirm(`${editing.date} の ${subjectName} を削除します。よろしいですか？`)) return;
+      state.entries[editing.date] = (state.entries[editing.date] || []).filter((entry) => entry.subjectId !== editing.subjectId);
+      if (state.entries[editing.date].length === 0) delete state.entries[editing.date];
+      persistAndRender();
+      entryDialog.close();
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      if (!confirm("科目と学習記録をすべて削除します。よろしいですか？")) return;
+      state = { subjects: [], entries: {} };
+      persistAndRender();
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "study-manager-2026-jul-aug-data.json";
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+
+    function loadState() {
+      const fallback = {
+        subjects: [
+          { id: "sample-target", number: 1, name: "ターゲット", goal: 1900, color: colors[0] },
+          { id: "sample-math", number: 2, name: "数学演習", goal: 300, color: colors[1] }
+        ],
+        entries: {}
+      };
+
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+        return normalizeState(stored ? JSON.parse(stored) : fallback);
+      } catch (error) {
+        console.warn(error);
+        return fallback;
+      }
+    }
+
+    function normalizeState(source) {
+      const subjects = Array.isArray(source.subjects) ? source.subjects : [];
+      const entries = source.entries && typeof source.entries === "object" ? source.entries : {};
+      return {
+        subjects: subjects.map((subject, index) => ({
+          id: subject.id || String(Date.now() + index),
+          number: Number(subject.number) || index + 1,
+          name: subject.name || `科目${index + 1}`,
+          goal: Number(subject.goal) || 0,
+          color: subject.color || colors[index % colors.length]
+        })),
+        entries
+      };
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function persistAndRender() {
+      saveState();
+      renderSubjects();
+      renderCalendar();
+      renderProgress();
+    }
+
+    function nextSubjectNumber() {
+      const used = new Set(state.subjects.map((subject) => subject.number));
+      let number = 1;
+      while (used.has(number)) number += 1;
+      return number;
+    }
+
+    function labelNumber(number) {
+      return circled[number - 1] || `(${number})`;
+    }
+
+    function renderSubjects() {
+      subjectList.innerHTML = "";
+      if (state.subjects.length === 0) {
+        subjectList.innerHTML = '<div class="empty-state">科目を追加してください</div>';
+        return;
+      }
+
+      state.subjects
+        .slice()
+        .sort((a, b) => a.number - b.number)
+        .forEach((subject) => {
+          const row = document.createElement("div");
+          row.className = "subject-row";
+          row.innerHTML = `
+            <span class="subject-number" style="background:${subject.color}">${labelNumber(subject.number)}</span>
+            <input class="subject-name" value="${escapeHtml(subject.name)}" aria-label="${labelNumber(subject.number)}の科目名">
+            <input class="goal-input" type="number" min="0" step="1" value="${Number(subject.goal) || 0}" aria-label="${labelNumber(subject.number)}の最終ゴール" title="最終ゴール">
+            <button class="icon-btn" type="button" aria-label="科目を削除">削除</button>
+          `;
+
+          row.querySelector(".subject-name").addEventListener("change", (event) => {
+            subject.name = event.target.value.trim() || subject.name;
+            persistAndRender();
+          });
+
+          row.querySelector(".goal-input").addEventListener("change", (event) => {
+            subject.goal = Math.max(0, Number(event.target.value) || 0);
+            persistAndRender();
+          });
+
+          row.querySelector(".icon-btn").addEventListener("click", (event) => {
+            event.stopPropagation();
+            if (!confirm(`${labelNumber(subject.number)} ${subject.name} を削除します。この科目の記録も削除されます。よろしいですか？`)) return;
+            state.subjects = state.subjects.filter((item) => item.id !== subject.id);
+            Object.keys(state.entries).forEach((date) => {
+              state.entries[date] = state.entries[date].filter((entry) => entry.subjectId !== subject.id);
+              if (state.entries[date].length === 0) delete state.entries[date];
+            });
+            persistAndRender();
+          });
+
+          subjectList.appendChild(row);
+        });
+    }
+
+    function renderCalendar() {
+      calendarGrid.innerHTML = "";
+      VIEW_MONTHS.forEach((month) => {
+        const monthEl = document.createElement("section");
+        monthEl.className = "month";
+        monthEl.innerHTML = `
+          <div class="month-title"><span>${YEAR}年 ${monthNames[month]}</span><span>${monthStudyCount(month)}件</span></div>
+          <div class="weekday">${weekdays.map((day) => `<span>${day}</span>`).join("")}</div>
+          <div class="days"></div>
+        `;
+        const daysEl = monthEl.querySelector(".days");
+        const firstDay = new Date(YEAR, month, 1).getDay();
+        const daysInMonth = new Date(YEAR, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i += 1) {
+          const blank = document.createElement("div");
+          blank.className = "day blank";
+          daysEl.appendChild(blank);
+        }
+
+        for (let day = 1; day <= daysInMonth; day += 1) {
+          const date = formatDate(new Date(YEAR, month, day));
+          const dayEl = document.createElement("div");
+          dayEl.className = "day";
+          dayEl.innerHTML = `
+            <div class="date-line"><span>${day}</span><span>${weekdays[new Date(YEAR, month, day).getDay()]}</span></div>
+            <input class="day-input" type="text" inputmode="numeric" placeholder="追加する番号" value="" aria-label="${date}に追加する科目番号">
+            <div class="chips"></div>
+          `;
+
+          const input = dayEl.querySelector(".day-input");
+          input.addEventListener("change", () => applyNumbersToDate(date, input.value));
+          input.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              applyNumbersToDate(date, input.value);
+              input.blur();
+            }
+          });
+
+          const chips = dayEl.querySelector(".chips");
+          (state.entries[date] || []).forEach((entry) => {
+            const subject = subjectById(entry.subjectId);
+            if (!subject) return;
+            const chip = document.createElement("button");
+            chip.type = "button";
+            chip.className = `chip ${entryHasData(entry) ? "" : "empty"}`;
+            chip.style.background = entryHasData(entry) ? subject.color : "";
+            chip.innerHTML = escapeHtml(chipText(subject, entry)).replace(/\n/g, "<br>");
+            chip.title = "学習範囲を記録";
+            chip.addEventListener("click", () => openEntry(date, subject.id));
+            chips.appendChild(chip);
+          });
+
+          daysEl.appendChild(dayEl);
+        }
+
+        calendarGrid.appendChild(monthEl);
+      });
+    }
+
+    function applyNumbersToDate(date, value) {
+      const numbers = value
+        .split(/[,\s、，]+/)
+        .map((item) => Number(item.trim()))
+        .filter((number, index, array) => Number.isInteger(number) && number > 0 && array.indexOf(number) === index)
+        .slice(0, MAX_SUBJECTS_PER_DAY);
+
+      if (value.split(/[,\s、，]+/).filter(Boolean).length > MAX_SUBJECTS_PER_DAY) {
+        alert("1日に登録できる科目は9科目までです。");
+      }
+
+      const selectedSubjects = numbers
+        .map((number) => state.subjects.find((subject) => subject.number === number))
+        .filter(Boolean);
+
+      if (numbers.length && selectedSubjects.length === 0) {
+        alert("登録済みの科目番号を入力してください。");
+        renderCalendar();
+        return;
+      }
+
+      const existing = state.entries[date] || [];
+      const merged = existing.slice();
+
+      selectedSubjects.forEach((subject) => {
+        if (merged.some((entry) => entry.subjectId === subject.id)) return;
+        if (merged.length >= MAX_SUBJECTS_PER_DAY) return;
+        merged.push({
+          subjectId: subject.id,
+          planStart: "",
+          planEnd: "",
+          actualStart: "",
+          actualEnd: "",
+          memo: ""
+        });
+      });
+
+      state.entries[date] = merged;
+
+      if (state.entries[date].length === 0) delete state.entries[date];
+      persistAndRender();
+    }
+
+    function openEntry(date, subjectId) {
+      const subject = subjectById(subjectId);
+      const entry = findEntry(date, subjectId);
+      if (!subject || !entry) return;
+      editing = { date, subjectId };
+      modalTitle.textContent = `${labelNumber(subject.number)} ${subject.name}`;
+      modalSub.textContent = `${date} の学習範囲`;
+      planStart.value = entry.planStart || "";
+      planEnd.value = entry.planEnd || "";
+      actualStart.value = entry.actualStart || entry.start || "";
+      actualEnd.value = entry.actualEnd || entry.end || "";
+      entryMemo.value = entry.memo || "";
+      entryDialog.showModal();
+    }
+
+    function renderProgress() {
+      const records = allRecords();
+      const completed = records.filter((record) => record.actualStart || record.actualEnd || record.start || record.end).length;
+      const activeDays = new Set(records.map((record) => record.date)).size;
+      const averageProgress = calculateAverageProgress();
+      const latest = records.slice().sort((a, b) => b.date.localeCompare(a.date))[0];
+
+      progressSummary.innerHTML = `
+        <div class="metric"><div class="metric-label">登録科目</div><div class="metric-value">${state.subjects.length}</div></div>
+        <div class="metric"><div class="metric-label">学習日</div><div class="metric-value">${activeDays}</div></div>
+        <div class="metric"><div class="metric-label">記録数</div><div class="metric-value">${completed}</div></div>
+        <div class="metric"><div class="metric-label">平均進捗</div><div class="metric-value">${averageProgress}%</div></div>
+      `;
+
+      if (state.subjects.length === 0) {
+        gantt.innerHTML = '<div class="empty-state">科目を追加すると進捗表が表示されます</div>';
+        return;
+      }
+
+      const rows = state.subjects
+        .slice()
+        .sort((a, b) => a.number - b.number)
+        .map((subject) => {
+          const subjectRecords = records.filter((record) => record.subject.id === subject.id);
+          const progress = subjectProgress(subject, subjectRecords);
+          const bars = subjectRecords.map((record) => {
+            const dayIndex = daysBetween(chartStart, parseDate(record.date));
+            const left = (dayIndex / totalDays) * 100;
+            const width = Math.max(1.2, 100 / totalDays);
+            const label = record.actualStart || record.actualEnd || record.start || record.end
+              ? `実行 ${record.actualStart || record.start || ""} → ${record.actualEnd || record.end || "継続"}`
+              : `予定 ${record.planStart || ""} → ${record.planEnd || ""}`;
+            return `<div class="bar" style="left:${left}%; width:${width}%; background:${subject.color}" title="${record.date} ${escapeHtml(label)}">${escapeHtml(label)}</div>`;
+          }).join("");
+          const latestForSubject = subjectRecords.slice().sort((a, b) => b.date.localeCompare(a.date))[0];
+          const latestText = latestForSubject ? latestRecordText(latestForSubject) : "記録なし";
+          const goalText = Number(subject.goal) > 0 ? `ゴール ${subject.goal}` : "ゴール未設定";
+          return `
+            <div class="gantt-row">
+              <div class="gantt-label">
+                <strong>${labelNumber(subject.number)} ${escapeHtml(subject.name)}</strong><br>
+                <small>${escapeHtml(goalText)} / 進捗 ${progress}%</small><br>
+                <small>${escapeHtml(latestText)}</small>
+                <div class="subject-progress"><span style="width:${progress}%; background:${subject.color}"></span></div>
+              </div>
+              <div class="track">${bars}</div>
+            </div>
+          `;
+        }).join("");
+
+      gantt.innerHTML = `
+        <div class="gantt-inner">
+          <div class="gantt-header">
+            <div class="gantt-label">科目</div>
+            <div class="gantt-months">${VIEW_MONTHS.map((month) => `<span>${monthNames[month]}</span>`).join("")}</div>
+          </div>
+          ${rows}
+        </div>
+      `;
+
+      if (latest) {
+        progressSummary.lastElementChild.querySelector(".metric-label").textContent = "最新記録";
+        progressSummary.lastElementChild.querySelector(".metric-value").style.fontSize = "15px";
+        progressSummary.lastElementChild.querySelector(".metric-value").textContent = `${latest.date} ${latest.subject.name}`;
+      }
+    }
+
+    function allRecords() {
+      return Object.entries(state.entries).flatMap(([date, entries]) => {
+        if (!isVisibleDate(date)) return [];
+        return entries.map((entry) => {
+          const subject = subjectById(entry.subjectId);
+          return subject ? { date, subject, ...entry } : null;
+        }).filter(Boolean);
+      });
+    }
+
+    function calculateAverageProgress() {
+      const subjectsWithGoal = state.subjects.filter((subject) => Number(subject.goal) > 0);
+      if (subjectsWithGoal.length === 0) return 0;
+      const total = subjectsWithGoal.reduce((sum, subject) => {
+        const records = allRecords().filter((record) => record.subject.id === subject.id);
+        return sum + subjectProgress(subject, records);
+      }, 0);
+      return Math.round(total / subjectsWithGoal.length);
+    }
+
+    function subjectProgress(subject, records) {
+      const goal = Number(subject.goal) || 0;
+      if (goal <= 0) return 0;
+      const best = records.reduce((max, record) => {
+        return Math.max(max, extractNumber(record.actualEnd), extractNumber(record.actualStart), extractNumber(record.end), extractNumber(record.start));
+      }, 0);
+      return Math.min(100, Math.round((best / goal) * 100));
+    }
+
+    function extractNumber(value) {
+      const match = String(value || "").match(/\d+(?:\.\d+)?/);
+      return match ? Number(match[0]) : 0;
+    }
+
+    function subjectById(id) {
+      return state.subjects.find((subject) => subject.id === id);
+    }
+
+    function findEntry(date, subjectId) {
+      return (state.entries[date] || []).find((entry) => entry.subjectId === subjectId);
+    }
+
+    function numbersForDate(date) {
+      return (state.entries[date] || [])
+        .map((entry) => subjectById(entry.subjectId))
+        .filter(Boolean)
+        .map((subject) => subject.number)
+        .join(",");
+    }
+
+    function chipText(subject, entry) {
+      const base = `${labelNumber(subject.number)} ${subject.name}`;
+      const plan = entry.planStart || entry.planEnd ? `予定 ${entry.planStart || ""}→${entry.planEnd || ""}` : "";
+      const actualStartValue = entry.actualStart || entry.start || "";
+      const actualEndValue = entry.actualEnd || entry.end || "";
+      const actual = actualStartValue || actualEndValue ? `実行 ${actualStartValue}→${actualEndValue}` : "";
+      if (plan || actual) return `${base}\n${[plan, actual].filter(Boolean).join(" / ")}`;
+      return base;
+    }
+
+    function entryHasData(entry) {
+      return Boolean(entry.planStart || entry.planEnd || entry.actualStart || entry.actualEnd || entry.start || entry.end);
+    }
+
+    function latestRecordText(record) {
+      const plan = record.planStart || record.planEnd ? `予定 ${record.planStart || ""} - ${record.planEnd || ""}` : "";
+      const actualStartValue = record.actualStart || record.start || "";
+      const actualEndValue = record.actualEnd || record.end || "";
+      const actual = actualStartValue || actualEndValue ? `実行 ${actualStartValue} - ${actualEndValue}` : "";
+      return `${record.date} ${[plan, actual].filter(Boolean).join(" / ") || "予定のみ"}`;
+    }
+
+    function monthStudyCount(month) {
+      const prefix = `${YEAR}-${String(month + 1).padStart(2, "0")}`;
+      return Object.keys(state.entries)
+        .filter((date) => date.startsWith(prefix))
+        .reduce((sum, date) => sum + state.entries[date].length, 0);
+    }
+
+    function isVisibleDate(value) {
+      const date = parseDate(value);
+      return date >= chartStart && date <= chartEnd;
+    }
+
+    function formatDate(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    }
+
+    function parseDate(value) {
+      const [year, month, day] = value.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function daysBetween(start, end) {
+      return Math.floor((end - start) / 86400000);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    persistAndRender();
+  </script>
+</body>
+</html>
